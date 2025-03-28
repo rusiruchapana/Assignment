@@ -3,6 +3,7 @@ package repository
 import (
 	"book-api/internal/model"
 	"encoding/json"
+	"errors"
 	"os"
 	"sync"
 )
@@ -10,6 +11,7 @@ import (
 type BookRepository interface {
 	Create(book model.Book) error
 	GetAll() ([]model.Book, error)
+	GetByID(id string) (*model.Book, error)
 }
 
 type fileBookRepository struct {
@@ -66,4 +68,19 @@ func (r *fileBookRepository) Create(book model.Book) error {
 
 func (r *fileBookRepository) GetAll() ([]model.Book, error) {
 	return r.readBooks()
+}
+
+func (r *fileBookRepository) GetByID(id string) (*model.Book, error) {
+	books, err := r.readBooks()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, book := range books {
+		if book.BookID == id {
+			return &book, nil
+		}
+	}
+
+	return nil, errors.New("book not found")
 }

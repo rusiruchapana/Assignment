@@ -11,6 +11,7 @@ import (
 type BookService interface {
 	CreateBook(book model.Book) (*model.Book, error)
 	GetAllBooks() ([]model.Book, error)
+	GetBookByID(id string) (*model.Book, error)
 }
 
 type bookService struct {
@@ -52,4 +53,8 @@ func (s *bookService) CreateBook(book model.Book) (*model.Book, error) {
 
 func (s *bookService) GetAllBooks() ([]model.Book, error) {
 	return s.repo.GetAll()
+}
+
+func (s *bookService) GetBookByID(id string) (*model.Book, error) {
+	return s.repo.GetByID(id)
 }
