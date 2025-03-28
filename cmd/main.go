@@ -20,6 +20,8 @@ func main() {
 	router.HandleFunc("/books", bookController.GetAllBooks).Methods("GET")
 	router.HandleFunc("/books/{id}", bookController.GetBookByID).Methods("GET")
 	router.HandleFunc("/books/{id}", bookController.UpdateBook).Methods("PUT")
+	router.HandleFunc("/books/search", bookController.SearchBooks).Methods("GET")
+	router.HandleFunc("/books", bookController.GetBooksPaginated).Methods("GET")
 
 	log.Println("Server starting on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", router))

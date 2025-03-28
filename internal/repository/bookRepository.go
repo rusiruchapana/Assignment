@@ -13,6 +13,7 @@ type BookRepository interface {
 	GetAll() ([]model.Book, error)
 	GetByID(id string) (*model.Book, error)
 	Update(id string, book model.Book) error
+	Delete(id string) error
 }
 
 type fileBookRepository struct {
@@ -96,6 +97,28 @@ func (r *fileBookRepository) Update(id string, updatedBook model.Book) error {
 	for i, book := range books {
 		if book.BookID == id {
 			books[i] = updatedBook
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return errors.New("book not found")
+	}
+
+	return r.writeBooks(books)
+}
+
+func (r *fileBookRepository) Delete(id string) error {
+	books, err := r.readBooks()
+	if err != nil {
+		return err
+	}
+
+	found := false
+	for i, book := range books {
+		if book.BookID == id {
+			books = append(books[:i], books[i+1:]...)
 			found = true
 			break
 		}

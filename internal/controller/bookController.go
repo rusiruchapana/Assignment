@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 )
 
 type BookController struct {
@@ -79,4 +80,56 @@ func (c *BookController) UpdateBook(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(updatedBook)
+}
+
+func (c *BookController) DeleteBook(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	err := c.service.DeleteBook(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (c *BookController) SearchBooks(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query().Get("q")
+
+	books, err := c.service.SearchBooks(query)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(books)
+}
+
+func (c *BookController) GetBooksPaginated(w http.ResponseWriter, r *http.Request) {
+	limit := 10 // default
+	offset := 0 // default
+
+	if l := r.URL.Query().Get("limit"); l != "" {
+		if lInt, err := strconv.Atoi(l); err == nil && lInt > 0 {
+			limit = lInt
+		}
+	}
+
+	if o := r.URL.Query().Get("offset"); o != "" {
+		if oInt, err := strconv.Atoi(o); err == nil && oInt >= 0 {
+			offset = oInt
+		}
+	}
+
+	books, err := c.service.GetBooksPaginated(limit, offset)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(books)
 }
