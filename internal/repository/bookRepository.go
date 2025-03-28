@@ -9,6 +9,7 @@ import (
 
 type BookRepository interface {
 	Create(book model.Book) error
+	GetAll() ([]model.Book, error)
 }
 
 type fileBookRepository struct {
@@ -61,4 +62,8 @@ func (r *fileBookRepository) Create(book model.Book) error {
 
 	books = append(books, book)
 	return r.writeBooks(books)
+}
+
+func (r *fileBookRepository) GetAll() ([]model.Book, error) {
+	return r.readBooks()
 }

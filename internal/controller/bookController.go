@@ -33,3 +33,14 @@ func (c *BookController) CreateBook(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(createdBook)
 }
+
+func (c *BookController) GetAllBooks(w http.ResponseWriter, r *http.Request) {
+	books, err := c.service.GetAllBooks()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(books)
+}
