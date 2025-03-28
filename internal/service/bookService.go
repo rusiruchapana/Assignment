@@ -12,6 +12,7 @@ type BookService interface {
 	CreateBook(book model.Book) (*model.Book, error)
 	GetAllBooks() ([]model.Book, error)
 	GetBookByID(id string) (*model.Book, error)
+	UpdateBook(id string, book model.Book) (*model.Book, error)
 }
 
 type bookService struct {
@@ -57,4 +58,25 @@ func (s *bookService) GetAllBooks() ([]model.Book, error) {
 
 func (s *bookService) GetBookByID(id string) (*model.Book, error) {
 	return s.repo.GetByID(id)
+}
+
+func (s *bookService) UpdateBook(id string, book model.Book) (*model.Book, error) {
+	// Ensure the ID in the path matches the book ID
+	if id != book.BookID {
+		return nil, errors.New("ID in path does not match book ID")
+	}
+
+	// Check if book exists
+	_, err := s.repo.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update the book
+	err = s.repo.Update(id, book)
+	if err != nil {
+		return nil, err
+	}
+
+	return &book, nil
 }
